@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tilsab</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F8F5F2; /* Kırık Beyaz */
+            color: #4E4E4E; /* Koyu Kömür Grisi */
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h1, h2 {
+            color: #6B2737; /* Derin Bordo */
+        }
+        .chat-box {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .chat-history {
+            height: 250px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        input[type="text"], input[type="email"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #F8F5F2;
+        }
+        button {
+            background-color: #6B2737;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #4E4E4E;
+        }
+        .form-section {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tilsab'a hoş geldiniz</h1>
+        <div class="chat-box">
+            <div id="chat-history" class="chat-history">
+                <p><strong>Tilsab Asistan:</strong> Merhaba! Tilsab'a hoş geldiniz. Size dilbilgisi, Türk lehçeleri veya platformumuz hakkında nasıl yardımcı olabilirim?</p>
+            </div>
+            <input type="text" id="mesaj" placeholder="Mesajınızı yazın...">
+            <button id="sor-btn" onclick="mesajGonder()">Sor</button>
+        </div>
+
+        <div class="form-section">
+            <h2>İletişim Bilgilerinizi Bırakın</h2>
+            <input type="text" id="isim" placeholder="Adınız Soyadınız">
+            <input type="email" id="email" placeholder="E-posta Adresiniz">
+            <input type="text" id="ilgi_alani" placeholder="İlgilendiğiniz Türk Lehçesi (Örn: Kazakça, Uygurca)">
+            <input type="text" id="amac" placeholder="Öğrenme Amacınız (Örn: Akademik, Seyahat, Kişisel Gelişim)">
+            <button id="kaydet-btn" onclick="kayitOl()">Kaydet</button>
+        </div>
+    </div>
+
+    <script>
+        let gecmis = [];
+        
+        async function mesajGonder() {
+            const mesajInput = document.getElementById('mesaj');
+            const mesaj = mesajInput.value;
+            if (!mesaj) return;
+
+            const chatHistory = document.getElementById('chat-history');
+            chatHistory.innerHTML += `<p><strong>Siz:</strong> ${mesaj}</p>`;
+            mesajInput.value = '';
+
+            try {
+                const response = await fetch('/api/sohbet', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({mesaj: mesaj, gecmis: gecmis})
+                });
+                const data = await response.json();
+                if (data.basari) {
+                    chatHistory.innerHTML += `<p><strong>Tilsab Asistan:</strong> ${data.cevap}</p>`;
+                    gecmis.push({"role": "user", "content": mesaj});
+                    gecmis.push({"role": "assistant", "content": data.cevap});
+                } else {
+                    chatHistory.innerHTML += `<p><strong>Hata:</strong> ${data.hata}</p>`;
+                }
+            } catch (error) {
+                console.error("Hata:", error);
+            }
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        async function kayitOl() {
+            const isim = document.getElementById('isim').value;
+            const email = document.getElementById('email').value;
+            const ilgi_alani = document.getElementById('ilgi_alani').value;
+            const amac = document.getElementById('amac').value;
+            
+            if (!isim || !email) {
+                alert("İsim ve e-posta alanları zorunludur.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        isim: isim, 
+                        email: email,
+                        ilgi_alani: ilgi_alani,
+                        amac: amac
+                    })
+                });
+                const data = await response.json();
+                if (data.basari) {
+                    alert("Aramıza hoş geldin!");
+                    document.getElementById('isim').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('ilgi_alani').value = '';
+                    document.getElementById('amac').value = '';
+                } else {
+                    alert("Hata: " + data.hata);
+                }
+            } catch (error) {
+                console.error("Hata:", error);
+            }
+        }
+    </script>
+</body>
+</html>

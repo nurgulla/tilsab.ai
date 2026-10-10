@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tilsab - Yönetim Paneli</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F8F5F2;
+            color: #4E4E4E;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { color: #6B2737; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #6B2737;
+            color: white;
+        }
+        tr:nth-child(even) {background-color: #f2f2f2;}
+    </style>
+</head>
+<body>
+    <h1>Tilsab Ziyaretçi Paneli</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>İsim</th>
+                <th>E-posta</th>
+                <th>İlgilendiği Lehçe</th>
+                <th>Öğrenme Amacı</th>
+                <th>Tarih</th>
+            </tr>
+        </thead>
+        <tbody id="lead-list">
+        </tbody>
+    </table>
+
+    <script>
+        async function leadleriGetir() {
+            try {
+                const response = await fetch('/api/leads');
+                const data = await response.json();
+                if (data.basari) {
+                    const tbody = document.getElementById('lead-list');
+                    data.leads.forEach(lead => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${lead.id}</td>
+                            <td>${lead.isim}</td>
+                            <td>${lead.email}</td>
+                            <td>${lead.ilgi_alani || '-'}</td>
+                            <td>${lead.amac || '-'}</td>
+                            <td>${lead.tarih}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                console.error("Veri çekme hatası:", error);
+            }
+        }
+        
+        window.onload = leadleriGetir;
+    </script>
+</body>
+</html>
