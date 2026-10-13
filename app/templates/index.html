@@ -80,7 +80,7 @@
             <h2>İletişim Bilgilerinizi Bırakın</h2>
             <input type="text" id="isim" placeholder="Adınız Soyadınız">
             <input type="email" id="email" placeholder="E-posta Adresiniz">
-            <input type="text" id="ilgi_alani" placeholder="İlgilendiğiniz Türk Lehçesi (Örn: Kazakça, Uygurca)">
+            <input type="text" id="telefon" placeholder="Telefon Numaranız">
             <input type="text" id="amac" placeholder="Öğrenme Amacınız (Örn: Akademik, Seyahat, Kişisel Gelişim)">
             <button id="kaydet-btn" onclick="kayitOl()">Kaydet</button>
         </div>
@@ -121,7 +121,7 @@
         async function kayitOl() {
             const isim = document.getElementById('isim').value;
             const email = document.getElementById('email').value;
-            const ilgi_alani = document.getElementById('ilgi_alani').value;
+            const telefon = document.getElementById('telefon').value;
             const amac = document.getElementById('amac').value;
             
             if (!isim || !email) {
@@ -136,7 +136,7 @@
                     body: JSON.stringify({
                         isim: isim, 
                         email: email,
-                        ilgi_alani: ilgi_alani,
+                        telefon: telefon,
                         amac: amac
                     })
                 });
@@ -145,7 +145,7 @@
                     alert("Aramıza hoş geldin!");
                     document.getElementById('isim').value = '';
                     document.getElementById('email').value = '';
-                    document.getElementById('ilgi_alani').value = '';
+                    document.getElementById('telefon').value = '';
                     document.getElementById('amac').value = '';
                 } else {
                     alert("Hata: " + data.hata);
