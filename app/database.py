@@ -16,7 +16,7 @@ def init_db(app):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             isim TEXT NOT NULL,
             email TEXT NOT NULL,
-            ilgi_alani TEXT,
+            telefon TEXT,
             amac TEXT,
             tarih TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -24,15 +24,24 @@ def init_db(app):
     conn.commit()
     conn.close()
 
-def lead_ekle(isim, email, ilgi_alani="", amac=""):
+def lead_ekle(isim, email, telefon="", amac=""):
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute(
-        'INSERT INTO leads (isim, email, ilgi_alani, amac) VALUES (?, ?, ?, ?)',
-        (isim, email, ilgi_alani, amac)
-    )
-    conn.commit()
-    conn.close()
+
+    try:
+        cursor.execute(
+            'INSERT INTO leads (isim, email, telefon, amac) VALUES (?, ?, ?, ?)',
+            (isim, email, telefon, amac)
+        )
+        conn.commit()
+
+    except Exception as e:
+        conn.rollback()
+        print(f"Lead ekleme hatası: {e}")
+        raise
+
+    finally:
+        conn.close()
 
 def tum_leadler():
     conn = get_db()
