@@ -35,7 +35,7 @@ def api_lead_ekle():
         return jsonify({'basari': False, 'hata': 'Isim ve e-posta alanlari zorunludur.'}), 400
         
     try:
-        lead_ekle(data['isim'], data['email'], data.get('ilgi_alani', ''), data.get('amac', ''))
+        lead_ekle(data['isim'], data['email'], data.get('telefon', ''), data.get('amac', ''))
         return jsonify({'basari': True, 'mesaj': 'Kayit basariyla eklendi.'}), 201
     except Exception as e:
         return jsonify({'basari': False, 'hata': str(e)}), 500
